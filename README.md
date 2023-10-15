@@ -1,0 +1,2 @@
+# errdec
+Error code decoder
