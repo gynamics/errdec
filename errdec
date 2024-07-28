@@ -35,23 +35,26 @@ class ErrorCodeChecker:
                 errnos[int(d["code"])] = (d["name"], d["comment"])
         return errnos
 
-    def search_info(self, errname: str):
+    def search_info(self, errname: str) -> str:
         "Search error name and find description in libc gnu info document."
         p = subprocess.Popen(["info", "libc", "Error Codes"], stdout=subprocess.PIPE)
         output = p.communicate()[0]
         flag = False
+        buf = []
+
         for line in output.decode().splitlines():
             m = self.docpat.match(line)
             if m is None:
                 if flag is True:
-                    print(line)
+                    buf.append(line)
             else:
-                if flag is True:
+                if flag is True or len(buf) >= 512:
                     break
                 else:
                     if m.groupdict()["name"] == errname:
-                        print(line)
+                        buf.append(line)
                         flag = True
+        return '\n'.join(buf)
 
     def check(self, errno: int):
         "Do a check, find and print information about errno."
@@ -59,11 +62,14 @@ class ErrorCodeChecker:
             print(f"Errno Name: {self.errnos[errno][0]}")
             print(f"Comments: {self.errnos[errno][1]}")
             print("Libc Info:\n")
-            self.search_info(self.errnos[errno][0])
-
+            print(self.search_info(self.errnos[errno][0]))
+        else:
+            print(f"Nothing found about errno {errno}.")
 
 def main():
-    if len(sys.argv) < 2:
+    if (len(sys.argv) < 2 or
+        sys.argv[1] == "-h" or
+        sys.argv[1] == "--help"):
         print("usage: errdec [ERRNO]")
         return
     checker = ErrorCodeChecker()
