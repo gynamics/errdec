@@ -19,3 +19,18 @@ Libc Info:
 (Hint: in bash `$?` expands to last return value, here it is 127.)
 
 You can also check multiple errno at a time (e. g. ./errdec 123 126 127). This is a python script so make sure you have `python` installed! Besides, if you want to search it in libc document, you will need `info` command, too.
+
+You can also modify this script for identifying error codes in a customized header.
+
+```python
+
+    my_err_defs = [
+        'projectA/errno.h',
+        'projectB/errno.h',
+        'projectB/ext-errno.h',
+    ]
+
+    ec = ErrorCodeChecker(my_err_defs)
+    # do one check
+    ec.check(errno)
+```
