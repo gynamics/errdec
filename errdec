@@ -32,7 +32,7 @@ class ErrorCodeChecker:
             matched = filter(None, [self.defpat.match(line) for line in f.readlines()])
             for m in matched:
                 d = m.groupdict()
-                errnos[int(d["code"])] = (d["name"], d["comment"])
+                errnos[int(d["code"], 0)] = (d["name"], d["comment"])
         return errnos
 
     def search_info(self, errname: str) -> str:
@@ -74,7 +74,7 @@ def main():
         return
     checker = ErrorCodeChecker()
     for errno in sys.argv[1:]:
-        checker.check(int(errno))
+        checker.check(int(errno, 0))
 
 
 if __name__ == "__main__":
